@@ -1,0 +1,28 @@
+# Dependências
+node_modules/
+dist/
+
+# Variáveis de ambiente
+.env
+
+# Logs
+logs/
+*.log
+
+# Cobertura de testes
+coverage/
+
+# Build
+dist/
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
