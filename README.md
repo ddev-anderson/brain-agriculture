@@ -1,101 +1,101 @@
 # 🌾 Brain Agriculture API
 
-API RESTful para gestão rural — cadastro de produtores, fazendas, safras, culturas agrícolas e plantios.
+RESTful API for rural management — registration of producers, farms, harvests, crops, and plantings.
 
 ---
 
-## Índice
+## Table of Contents
 
 - [Setup](#setup)
-- [Como rodar com Docker](#como-rodar-com-docker)
-- [Variáveis de ambiente](#variáveis-de-ambiente)
-- [Endpoints da API](#endpoints-da-api)
-- [Decisões técnicas](#decisões-técnicas)
-- [Modelo de Plantio](#modelo-de-plantio)
-- [Diagrama ER](#diagrama-er)
-- [Fluxos de negócio](#fluxos-de-negócio)
+- [Running with Docker](#running-with-docker)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Technical Decisions](#technical-decisions)
+- [Planting Model](#planting-model)
+- [ER Diagram](#er-diagram)
+- [Business Flows](#business-flows)
 
 ---
 
 ## Setup
 
-### Pré-requisitos
+### Prerequisites
 
-| Ferramenta | Versão mínima     |
+| Tool       | Minimum Version   |
 | ---------- | ----------------- |
 | Node.js    | 20.x              |
 | npm        | 10.x              |
 | PostgreSQL | 15.x              |
-| Docker     | 24.x _(opcional)_ |
+| Docker     | 24.x _(optional)_ |
 
-### Instalação local
+### Local Installation
 
 ```bash
-# 1. Clonar o repositório
+# 1. Clone the repository
 git clone <repo-url>
 cd brain-agriculture
 
-# 2. Instalar dependências
+# 2. Install dependencies
 npm install
 
-# 3. Copiar e preencher variáveis de ambiente
+# 3. Copy and fill in environment variables
 cp .env.example .env
 
-# 4. Rodar as migrations (banco deve estar rodando)
+# 4. Run migrations (database must be running)
 npm run migration:run
 
-# 5. (Opcional) Popular dados iniciais
+# 5. (Optional) Seed initial data
 npm run seed
 
-# 6. Iniciar em modo desenvolvimento
+# 6. Start in development mode
 npm run start:dev
 ```
 
-A API ficará disponível em `http://localhost:3000/api/v1`.  
-O Swagger estará em `http://localhost:3000/docs`.
+The API will be available at `http://localhost:3000/api/v1`.  
+Swagger will be available at `http://localhost:3000/docs`.
 
 ---
 
-## Como rodar com Docker
+## Running with Docker
 
-O `docker-compose.yml` sobe dois serviços: a **API** (Node 20) e o **PostgreSQL 15**.  
-As migrations são executadas automaticamente ao iniciar o container da API.
+The `docker-compose.yml` starts two services: the **API** (Node 20) and **PostgreSQL 15**.  
+Migrations run automatically when the API container starts.
 
 ```bash
-# Subir todos os serviços (modo desenvolvimento com hot-reload)
+# Start all services (development mode with hot-reload)
 docker compose up
 
-# Subir em background
+# Start in background
 docker compose up -d
 
-# Parar e remover containers
+# Stop and remove containers
 docker compose down
 
-# Remover containers + volume do banco (reset completo)
+# Remove containers + database volume (full reset)
 docker compose down -v
 ```
 
-A API ficará em `http://localhost:3000/api/v1` e o Swagger em `http://localhost:3000/docs`.
+The API will be at `http://localhost:3000/api/v1` and Swagger at `http://localhost:3000/docs`.
 
-### Build para produção
+### Production Build
 
 ```bash
 docker compose build --target production
 ```
 
-O `Dockerfile` possui três estágios:
+The `Dockerfile` has three stages:
 
-| Estágio       | Descrição                                      |
-| ------------- | ---------------------------------------------- |
-| `development` | Instala todas as dependências + hot-reload     |
-| `build`       | Compila o TypeScript (`npm run build`)         |
-| `production`  | Copia apenas `dist/` e dependências de runtime |
+| Stage         | Description                                  |
+| ------------- | -------------------------------------------- |
+| `development` | Installs all dependencies + hot-reload       |
+| `build`       | Compiles TypeScript (`npm run build`)        |
+| `production`  | Copies only `dist/` and runtime dependencies |
 
 ---
 
-## Variáveis de ambiente
+## Environment Variables
 
-Crie um arquivo `.env` na raiz (baseado no `.env.example`):
+Create a `.env` file at the project root (based on `.env.example`):
 
 ```dotenv
 PORT=3000
@@ -110,22 +110,22 @@ DB_DATABASE=brain_agriculture
 
 ---
 
-## Endpoints da API
+## API Endpoints
 
-Todos os endpoints têm o prefixo `/api/v1`.  
-A documentação interativa completa está disponível em `GET /docs` (Swagger UI).
+All endpoints are prefixed with `/api/v1`.  
+The full interactive documentation is available at `GET /docs` (Swagger UI).
 
-### Produtores — `/api/v1/producers`
+### Producers — `/api/v1/producers`
 
-| Método | Rota             | Descrição                     | Status de sucesso |
-| ------ | ---------------- | ----------------------------- | ----------------- |
-| POST   | `/producers`     | Cadastrar novo produtor       | `201 Created`     |
-| GET    | `/producers`     | Listar todos os produtores    | `200 OK`          |
-| GET    | `/producers/:id` | Buscar produtor por UUID      | `200 OK`          |
-| PUT    | `/producers/:id` | Atualizar nome e/ou documento | `200 OK`          |
-| DELETE | `/producers/:id` | Excluir produtor (cascade)    | `204 No Content`  |
+| Method | Route            | Description                 | Success Status   |
+| ------ | ---------------- | --------------------------- | ---------------- |
+| POST   | `/producers`     | Register a new producer     | `201 Created`    |
+| GET    | `/producers`     | List all producers          | `200 OK`         |
+| GET    | `/producers/:id` | Find producer by UUID       | `200 OK`         |
+| PUT    | `/producers/:id` | Update name and/or document | `200 OK`         |
+| DELETE | `/producers/:id` | Delete producer (cascade)   | `204 No Content` |
 
-**Exemplo — criar produtor (pessoa física):**
+**Example — create individual producer:**
 
 ```json
 POST /api/v1/producers
@@ -135,7 +135,7 @@ POST /api/v1/producers
 }
 ```
 
-**Exemplo — criar produtor (pessoa jurídica):**
+**Example — create corporate producer:**
 
 ```json
 POST /api/v1/producers
@@ -147,17 +147,17 @@ POST /api/v1/producers
 
 ---
 
-### Fazendas — `/api/v1/farms`
+### Farms — `/api/v1/farms`
 
-| Método | Rota         | Descrição                                 | Status de sucesso |
-| ------ | ------------ | ----------------------------------------- | ----------------- |
-| POST   | `/farms`     | Cadastrar fazenda vinculada a um produtor | `201 Created`     |
-| GET    | `/farms`     | Listar todas as fazendas                  | `200 OK`          |
-| GET    | `/farms/:id` | Buscar fazenda por UUID                   | `200 OK`          |
-| PUT    | `/farms/:id` | Atualizar dados da fazenda                | `200 OK`          |
-| DELETE | `/farms/:id` | Excluir fazenda (cascade nos plantios)    | `204 No Content`  |
+| Method | Route        | Description                          | Success Status   |
+| ------ | ------------ | ------------------------------------ | ---------------- |
+| POST   | `/farms`     | Register a farm linked to a producer | `201 Created`    |
+| GET    | `/farms`     | List all farms                       | `200 OK`         |
+| GET    | `/farms/:id` | Find farm by UUID                    | `200 OK`         |
+| PUT    | `/farms/:id` | Update farm data                     | `200 OK`         |
+| DELETE | `/farms/:id` | Delete farm (cascade on plantings)   | `204 No Content` |
 
-**Exemplo — criar fazenda:**
+**Example — create farm:**
 
 ```json
 POST /api/v1/farms
@@ -172,19 +172,19 @@ POST /api/v1/farms
 }
 ```
 
-> **Regra de negócio:** `arableArea + vegetationArea ≤ totalArea`. Qualquer violação retorna `422 Unprocessable Entity`.
+> **Business rule:** `arableArea + vegetationArea ≤ totalArea`. Any violation returns `422 Unprocessable Entity`.
 
 ---
 
-### Safras — `/api/v1/harvests`
+### Harvests — `/api/v1/harvests`
 
-| Método | Rota            | Descrição                                   | Status de sucesso |
-| ------ | --------------- | ------------------------------------------- | ----------------- |
-| POST   | `/harvests`     | Cadastrar ano agrícola                      | `201 Created`     |
-| GET    | `/harvests`     | Listar todas as safras                      | `200 OK`          |
-| DELETE | `/harvests/:id` | Excluir safra (bloqueado se tiver plantios) | `204 No Content`  |
+| Method | Route           | Description                                 | Success Status   |
+| ------ | --------------- | ------------------------------------------- | ---------------- |
+| POST   | `/harvests`     | Register an agricultural year               | `201 Created`    |
+| GET    | `/harvests`     | List all harvests                           | `200 OK`         |
+| DELETE | `/harvests/:id` | Delete harvest (blocked if plantings exist) | `204 No Content` |
 
-**Exemplo:**
+**Example:**
 
 ```json
 POST /api/v1/harvests
@@ -195,37 +195,37 @@ POST /api/v1/harvests
 
 ---
 
-### Culturas — `/api/v1/crops`
+### Crops — `/api/v1/crops`
 
-| Método | Rota         | Descrição                                     | Status de sucesso |
-| ------ | ------------ | --------------------------------------------- | ----------------- |
-| POST   | `/crops`     | Cadastrar cultura no catálogo                 | `201 Created`     |
-| GET    | `/crops`     | Listar todas as culturas                      | `200 OK`          |
-| DELETE | `/crops/:id` | Excluir cultura (bloqueado se tiver plantios) | `204 No Content`  |
+| Method | Route        | Description                              | Success Status   |
+| ------ | ------------ | ---------------------------------------- | ---------------- |
+| POST   | `/crops`     | Register a crop in the catalog           | `201 Created`    |
+| GET    | `/crops`     | List all crops                           | `200 OK`         |
+| DELETE | `/crops/:id` | Delete crop (blocked if plantings exist) | `204 No Content` |
 
-**Exemplos de culturas:**
+**Crop examples:**
 
 ```json
 POST /api/v1/crops
-{ "name": "Soja" }
+{ "name": "Soybean" }
 
-{ "name": "Milho" }
-{ "name": "Café" }
-{ "name": "Cana-de-Açúcar" }
-{ "name": "Algodão" }
+{ "name": "Corn" }
+{ "name": "Coffee" }
+{ "name": "Sugarcane" }
+{ "name": "Cotton" }
 ```
 
 ---
 
-### Plantios — `/api/v1/plantings`
+### Plantings — `/api/v1/plantings`
 
-| Método | Rota             | Descrição                                     | Status de sucesso |
-| ------ | ---------------- | --------------------------------------------- | ----------------- |
-| POST   | `/plantings`     | Registrar plantio (fazenda + safra + cultura) | `201 Created`     |
-| GET    | `/plantings`     | Listar todos os plantios                      | `200 OK`          |
-| DELETE | `/plantings/:id` | Excluir registro de plantio                   | `204 No Content`  |
+| Method | Route            | Description                                 | Success Status   |
+| ------ | ---------------- | ------------------------------------------- | ---------------- |
+| POST   | `/plantings`     | Register a planting (farm + harvest + crop) | `201 Created`    |
+| GET    | `/plantings`     | List all plantings                          | `200 OK`         |
+| DELETE | `/plantings/:id` | Delete a planting record                    | `204 No Content` |
 
-**Exemplo:**
+**Example:**
 
 ```json
 POST /api/v1/plantings
@@ -238,86 +238,86 @@ POST /api/v1/plantings
 
 ---
 
-## Decisões técnicas
+## Technical Decisions
 
-### Arquitetura: Clean Architecture
+### Architecture: Clean Architecture
 
-O projeto segue os princípios da **Clean Architecture**, separando o código em quatro camadas:
+The project follows **Clean Architecture** principles, separating code into four layers:
 
 ```
 src/
-├── domain/          # Entidades, interfaces de repositório, Value Objects, erros de domínio
-├── application/     # Use Cases e DTOs — orquestradores da lógica de negócio
-├── infra/           # TypeORM repositories, módulos NestJS, migrations, seeds
-└── presentation/    # Controllers HTTP e filtros de exceção
+├── domain/          # Entities, repository interfaces, Value Objects, domain errors
+├── application/     # Use Cases and DTOs — business logic orchestrators
+├── infra/           # TypeORM repositories, NestJS modules, migrations, seeds
+└── presentation/    # HTTP controllers and exception filters
 ```
 
-**Por que essa estrutura?**  
-A regra de dependência flui para dentro: `presentation → application → domain`. A camada de domínio não conhece nada do framework ou do banco, tornando o núcleo de negócio testável e independente de infraestrutura.
+**Why this structure?**  
+The dependency rule flows inward: `presentation → application → domain`. The domain layer has no knowledge of the framework or database, making the business core testable and infrastructure-independent.
 
 ---
 
 ### Framework: NestJS + TypeScript
 
-- **NestJS** provê Dependency Injection, decorators e organização modular sem sacrificar a performance do Node.js.
-- **TypeScript** garante tipagem estática em todas as camadas, reduzindo erros e facilitando refatorações.
+- **NestJS** provides Dependency Injection, decorators, and modular organization without sacrificing Node.js performance.
+- **TypeScript** enforces static typing across all layers, reducing bugs and easing refactoring.
 
 ---
 
 ### ORM: TypeORM
 
-- Migrations versionadas para controle de schema.
-- Soft delete via `DeleteDateColumn` em todas as entidades — dados excluídos são preservados no banco com `deleted_at`.
-- Índices explícitos nas colunas de join (ex: `producer_id`, `farm_id`) para performance em queries relacionais.
+- Versioned migrations for schema control.
+- Soft delete via `DeleteDateColumn` on all entities — deleted records are preserved in the database with a `deleted_at` timestamp.
+- Explicit indexes on join columns (e.g. `producer_id`, `farm_id`) for relational query performance.
 
 ---
 
-### Value Object: Documento (CPF/CNPJ)
+### Value Object: Document (CPF/CNPJ)
 
-O CPF e o CNPJ são modelados como **Value Objects** (`src/domain/value-objects/tax-id.vo.ts`), não como strings simples.  
-O construtor valida estrutura e **dígitos verificadores** no momento da criação — se inválido, lança `ValidationDomainError` que é automaticamente convertido em `422 Unprocessable Entity` pelo filtro global.
+CPF and CNPJ are modeled as **Value Objects** (`src/domain/value-objects/tax-id.vo.ts`), not as plain strings.  
+The constructor validates structure and **check digits** at creation time — if invalid, it throws a `ValidationDomainError` that is automatically converted to `422 Unprocessable Entity` by the global filter.
 
-Isso garante que **um documento inválido nunca chegue ao banco de dados**.
-
----
-
-### Validação global
-
-- **`class-validator`** + `ValidationPipe` com `whitelist: true` e `forbidNonWhitelisted: true` — apenas propriedades declaradas nos DTOs chegam aos Use Cases.
-- **`HttpExceptionFilter`** global captura exceções de domínio (`ValidationDomainError`, `BusinessRuleViolationError`) e as converte em respostas HTTP padronizadas.
+This guarantees that **an invalid document never reaches the database**.
 
 ---
 
-### Banco de dados: PostgreSQL 15
+### Global Validation
 
-- Escolhido pela robustez e suporte nativo a UUID, tipos numéricos de precisão arbitrária e constraints relacionais.
-- Áreas da fazenda usam `numeric(12,4)` para evitar erros de ponto flutuante.
+- **`class-validator`** + `ValidationPipe` with `whitelist: true` and `forbidNonWhitelisted: true` — only properties declared in the DTOs reach the Use Cases.
+- **`HttpExceptionFilter`** globally catches domain exceptions (`ValidationDomainError`, `BusinessRuleViolationError`) and converts them into standardized HTTP responses.
+
+---
+
+### Database: PostgreSQL 15
+
+- Chosen for its robustness and native support for UUIDs, arbitrary-precision numeric types, and relational constraints.
+- Farm areas use `numeric(12,4)` to avoid floating-point errors.
 
 ---
 
 ### Swagger: `@nestjs/swagger`
 
-- Disponível em `/docs` em todos os ambientes.
-- DTOs anotados com `@ApiProperty` expõem exemplos reais diretamente na UI.
-- Todos os endpoints possuem `@ApiOperation`, `@ApiResponse` e `@ApiParam` documentados.
+- Available at `/docs` in all environments.
+- DTOs annotated with `@ApiProperty` expose real examples directly in the UI.
+- All endpoints have documented `@ApiOperation`, `@ApiResponse`, and `@ApiParam`.
 
 ---
 
-## Modelo de Plantio
+## Planting Model
 
-O **Plantio** é a entidade central do modelo de dados — representa o registro de que **uma determinada cultura foi plantada em uma fazenda durante uma safra específica**.
+The **Planting** is the central entity in the data model — it represents the record that **a specific crop was planted on a farm during a specific harvest season**.
 
-### Por que uma entidade de junção explícita?
+### Why an explicit junction entity?
 
-Uma relação many-to-many simples (Fazenda ↔ Cultura) não seria suficiente, pois o contexto **temporal** (safra/ano) é essencial para o agronegócio. O Plantio carrega essa dimensão extra:
+A simple many-to-many relationship (Farm ↔ Crop) would not be sufficient, because the **temporal context** (harvest/year) is essential in agribusiness. The Planting carries this extra dimension:
 
 ```
-Fazenda × Safra × Cultura → Plantio
+Farm × Harvest × Crop → Planting
 ```
 
-### Regra de negócio crítica
+### Critical Business Rule
 
-A combinação `(farmId, harvestId, cropId)` é **única** no banco (constraint `@Unique` na entidade) e verificada também na camada de aplicação antes do INSERT:
+The combination `(farmId, harvestId, cropId)` is **unique** in the database (`@Unique` constraint on the entity) and also verified at the application layer before INSERT:
 
 ```typescript
 // create-planting.use-case.ts
@@ -333,24 +333,24 @@ if (duplicate) {
 }
 ```
 
-Isso significa que:
+This means:
 
-- ✅ A mesma cultura pode ser registrada em **diferentes fazendas** na mesma safra.
-- ✅ A mesma fazenda pode plantar a mesma cultura em **safras diferentes**.
-- ❌ A mesma cultura **não pode** ser registrada duas vezes na mesma fazenda e safra.
+- ✅ The same crop can be registered on **different farms** in the same harvest.
+- ✅ The same farm can plant the same crop in **different harvests**.
+- ❌ The same crop **cannot** be registered twice on the same farm in the same harvest.
 
-### Integridade referencial
+### Referential Integrity
 
-| Relação             | Comportamento ao excluir                             |
-| ------------------- | ---------------------------------------------------- |
-| Produtor → Fazendas | `CASCADE` — exclui as fazendas junto                 |
-| Fazenda → Plantios  | `CASCADE` — exclui os plantios junto                 |
-| Safra → Plantios    | `RESTRICT` — bloqueia exclusão se existirem plantios |
-| Cultura → Plantios  | `RESTRICT` — bloqueia exclusão se existirem plantios |
+| Relationship        | Behavior on delete                                |
+| ------------------- | ------------------------------------------------- |
+| Producer → Farms    | `CASCADE` — deletes farms along with the producer |
+| Farm → Plantings    | `CASCADE` — deletes plantings linked to the farm  |
+| Harvest → Plantings | `RESTRICT` — blocks deletion if plantings exist   |
+| Crop → Plantings    | `RESTRICT` — blocks deletion if plantings exist   |
 
 ---
 
-## Diagrama ER
+## ER Diagram
 
 ```
 ┌──────────────────────┐         ┌──────────────────────────────────────────┐
@@ -386,65 +386,65 @@ Isso significa que:
                   harvest_id, crop_id)
 ```
 
-**Cardinalidades:**
+**Cardinalities:**
 
-| Relação             | Cardinalidade                                      |
-| ------------------- | -------------------------------------------------- |
-| Produtor → Fazendas | 1 : N                                              |
-| Fazenda → Plantios  | 1 : N                                              |
-| Safra → Plantios    | 1 : N                                              |
-| Cultura → Plantios  | 1 : N                                              |
-| Fazenda ↔ Cultura   | N : M (via Plantio + Safra como dimensão temporal) |
+| Relationship        | Cardinality                                          |
+| ------------------- | ---------------------------------------------------- |
+| Producer → Farms    | 1 : N                                                |
+| Farm → Plantings    | 1 : N                                                |
+| Harvest → Plantings | 1 : N                                                |
+| Crop → Plantings    | 1 : N                                                |
+| Farm ↔ Crop         | N : M (via Planting + Harvest as temporal dimension) |
 
 ---
 
-## Fluxos de negócio
+## Business Flows
 
-### Fluxo 1 — Cadastro completo de um produtor até o plantio
+### Flow 1 — Full registration from producer to planting
 
 ```
 1. POST /api/v1/producers
-   └─► Cria produtor (valida CPF/CNPJ via Value Object)
+   └─► Creates producer (validates CPF/CNPJ via Value Object)
 
 2. POST /api/v1/farms
-   └─► Cria fazenda vinculada ao produtor
-       └─► Valida: arableArea + vegetationArea ≤ totalArea
+   └─► Creates farm linked to the producer
+       └─► Validates: arableArea + vegetationArea ≤ totalArea
 
 3. POST /api/v1/harvests
-   └─► Cadastra o ano agrícola (ex: 2025)
+   └─► Registers the agricultural year (e.g. 2025)
 
 4. POST /api/v1/crops
-   └─► Cadastra a cultura no catálogo (ex: "Soja")
+   └─► Registers the crop in the catalog (e.g. "Soybean")
 
 5. POST /api/v1/plantings
-   └─► Registra o plantio (fazenda + safra + cultura)
-       └─► Valida: fazenda, safra e cultura existem
-       └─► Valida: combinação (farm, harvest, crop) ainda não cadastrada
+   └─► Records the planting (farm + harvest + crop)
+       └─► Validates: farm, harvest, and crop exist
+       └─► Validates: combination (farm, harvest, crop) not already registered
 ```
 
 ---
 
-### Fluxo 2 — Atualização de fazenda
+### Flow 2 — Farm update
 
 ```
 PUT /api/v1/farms/:id
-  ├─► Recupera fazenda existente
-  ├─► Mescla campos fornecidos com os valores atuais
-  └─► Revalida regra de áreas (arableArea + vegetationArea ≤ totalArea)
+  ├─► Retrieves existing farm
+  ├─► Merges provided fields with current values
+  └─► Re-validates area rule (arableArea + vegetationArea ≤ totalArea)
 ```
 
 ---
 
-### Fluxo 3 — Exclusão em cascata de produtor
+### Flow 3 — Cascade deletion of producer
 
 ```
 DELETE /api/v1/producers/:id
-  └─► Soft-delete do produtor
-      └─► CASCADE: soft-delete das fazendas
-          └─► CASCADE: soft-delete dos plantios vinculados às fazendas
+  └─► Soft-delete producer
+      └─► CASCADE: soft-delete farms
+          └─► CASCADE: soft-delete plantings linked to those farms
 ```
 
-> Os registros excluídos são mantidos no banco com `deleted_at` preenchido e não aparecem em consultas normais.
+> Deleted records are kept in the database with `deleted_at` filled in and do not appear in normal queries.
 
 ---
 
